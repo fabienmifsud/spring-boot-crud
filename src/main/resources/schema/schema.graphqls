@@ -1,0 +1,32 @@
+type Query {
+    clients:[Client]
+    products:[Product]
+    bookings:[Booking]
+    bookingsByClient(clientId: Int!):[Booking]
+}
+
+type Mutation {
+    createClient(name: String!, email: String!, dateOfBirth: String): Boolean
+    createProduct(name: String!, price: Float!): Boolean
+    createBooking(clientId: Int!, productId: Int!): Boolean
+}
+
+type Client {
+    id: ID,
+    name: String,
+    email: String,
+    dateOfBirth: String
+}
+
+type Product {
+    id: ID,
+    name: String,
+    price: Float
+}
+
+type Booking {
+    id: ID,
+    client: Client,
+    product: Product,
+    bookingDate: String
+}
