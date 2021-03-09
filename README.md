@@ -75,4 +75,5 @@ mutation createBooking {
 }
 ```
 
-Same app with other stacks are coming soon :)
+Same app with other stacks :
+- https://github.com/fabienmifsud/quarkus-crud
