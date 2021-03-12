@@ -30,7 +30,6 @@ public class ProductFetcher {
         product.setName(name);
         product.setPrice(price);
 
-
         return this.productRepository.save(product) != null;
     }
 }

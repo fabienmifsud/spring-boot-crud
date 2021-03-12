@@ -1,30 +1,17 @@
 package com.fmi.springbootcrud;
 
-import com.fmi.springbootcrud.fetcher.BookingFetcher;
-import com.fmi.springbootcrud.fetcher.ClientFetcher;
-import com.fmi.springbootcrud.fetcher.ProductFetcher;
-import com.fmi.springbootcrud.repository.BookingRepository;
-import com.fmi.springbootcrud.repository.ClientRepository;
-import com.fmi.springbootcrud.repository.ProductRepository;
-import com.fmi.springbootcrud.security.BasicSecurityConfiguration;
 import com.netflix.graphql.dgs.DgsQueryExecutor;
-import com.netflix.graphql.dgs.autoconfig.DgsAutoConfiguration;
-import graphql.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.LinkedHashMap;
 
-@SpringBootTest(classes = {BookingRepository.class, BookingFetcher.class, ProductRepository.class, ProductFetcher.class, ClientRepository.class, ClientFetcher.class, DgsAutoConfiguration.class})
-@EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class})
+@SpringBootTest
+@EnableAutoConfiguration
 class SpringBootCrudApplicationTests {
-
-    @MockBean
-    private BasicSecurityConfiguration conf;
 
     @Autowired
     private DgsQueryExecutor dgsQueryExecutor;
@@ -36,7 +23,7 @@ class SpringBootCrudApplicationTests {
                         "  createClient(name: \"toto2\", email: \"my.email@toto.com\", dateOfBirth: \"1986-01-17 00:12:12.000\")\n" +
                         "}",
                 "data.createClient");
-        Assert.assertTrue(created);
+        Assertions.assertThat(created).isTrue();
 
         LinkedHashMap client = dgsQueryExecutor.executeAndExtractJsonPath(
                 "query readClients {\n" +
@@ -49,17 +36,18 @@ class SpringBootCrudApplicationTests {
                         "}",
                 "data.clients[0]");
 
-        Assert.assertTrue(client.get("id").equals("1"));
-        Assert.assertTrue(client.get("name").equals("toto2"));
-        Assert.assertTrue(client.get("email").equals("my.email@toto.com"));
-        Assert.assertTrue(client.get("dateOfBirth").equals("1986-01-17 00:12:12.0"));
+
+        Assertions.assertThat(client.get("id")).isEqualTo("1");
+        Assertions.assertThat(client.get("name")).isEqualTo("toto2");
+        Assertions.assertThat(client.get("email")).isEqualTo("my.email@toto.com");
+        Assertions.assertThat(client.get("dateOfBirth")).isEqualTo("1986-01-17 00:12:12.0");
 
         created = dgsQueryExecutor.executeAndExtractJsonPath(
                 "mutation createProduct {\n" +
                         "  createProduct(name: \"product\", price: 10.99)\n" +
                         "}",
                 "data.createProduct");
-        Assert.assertTrue(created);
+        Assertions.assertThat(created).isTrue();
 
         LinkedHashMap product = dgsQueryExecutor.executeAndExtractJsonPath(
                 "query readProducts {\n" +
@@ -71,9 +59,9 @@ class SpringBootCrudApplicationTests {
                         "}",
                 "data.products[0]");
 
-        Assert.assertTrue(product.get("id").equals("1"));
-        Assert.assertTrue(product.get("name").equals("product"));
-        Assert.assertTrue(product.get("price").equals(10.99d));
+        Assertions.assertThat(product.get("id")).isEqualTo("1");
+        Assertions.assertThat(product.get("name")).isEqualTo("product");
+        Assertions.assertThat(product.get("price")).isEqualTo(10.99d);
 
         created = dgsQueryExecutor.executeAndExtractJsonPath(
                 "mutation createBooking {\n" +
@@ -81,7 +69,7 @@ class SpringBootCrudApplicationTests {
                         "}",
                 "data.createBooking");
 
-        Assert.assertTrue(created);
+        Assertions.assertThat(created).isTrue();
 
         LinkedHashMap booking = dgsQueryExecutor.executeAndExtractJsonPath(
                 "query readBookingsByClient {\n" +
@@ -94,9 +82,8 @@ class SpringBootCrudApplicationTests {
                         "}",
                 "data.bookingsByClient[0]");
 
-        Assert.assertTrue(((LinkedHashMap)booking.get("product")).get("name").equals("product"));
-        Assert.assertTrue(booking.get("bookingDate") != null);
-
+        Assertions.assertThat(((LinkedHashMap) booking.get("product")).get("name")).isEqualTo("product");
+        Assertions.assertThat(booking.get("bookingDate")).isNotNull();
     }
 
 }
